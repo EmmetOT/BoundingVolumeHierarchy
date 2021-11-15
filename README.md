@@ -23,3 +23,7 @@ Call 'update' whenever an object's position/rotation/scale/bounds changes.
 The simplest form of querying the tree involves just enumerating all nodes:
   
 ![Enumeration](https://i.imgur.com/mV6qDIH.png)
+  
+Naturally there is also a raycast method:
+
+![Raycast](https://i.imgur.com/1AarAEz.png)
