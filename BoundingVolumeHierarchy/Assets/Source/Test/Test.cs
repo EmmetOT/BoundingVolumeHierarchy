@@ -83,6 +83,15 @@ public class Test : MonoBehaviour
             m_bvh.Remove(obj);
     }
 
+    [ContextMenu("Rebuild Tree")]
+    public void RebuildTree()
+    {
+        if (m_bvh == null)
+            return;
+
+        m_bvh.RebuildBottomUp();
+    }
+
     public void OnDrawGizmos()
     {
         if (m_bvh == null || m_bvh.RootIsNull)
@@ -99,11 +108,5 @@ public class Test : MonoBehaviour
             Handles.color = col;
             Handles.DrawWireCube(node.AABB.center, node.AABB.size);
         }
-
-        //foreach (Bounds bounds in m_bvh.GetNonOverlappingVolumes())
-        //{
-        //    Handles.color = Color.black;
-        //    Handles.DrawWireCube(bounds.center, bounds.size);
-        //}
     }
 }

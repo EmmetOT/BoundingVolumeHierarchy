@@ -311,7 +311,7 @@ namespace BoundingVolumeHierarchy
                         Bounds aabbj = m_nodes[nodes[j]].AABB;
                         Bounds b = aabbi;
                         b.Encapsulate(aabbj);
-                        //b.Combine(aabbi, aabbj);
+
                         float cost = b.GetSurfaceArea();
                         if (cost < minCost)
                         {
@@ -324,11 +324,8 @@ namespace BoundingVolumeHierarchy
 
                 int index1 = nodes[iMin];
                 int index2 = nodes[jMin];
-                //b2TreeNode* child1 = m_nodes + index1;
-                //b2TreeNode* child2 = m_nodes + index2;
 
                 int parentIndex = AllocateNode();
-                //b2TreeNode* parent = m_nodes + parentIndex;
                 m_nodes[parentIndex].Child1 = index1;
                 m_nodes[parentIndex].Child2 = index2;
                 m_nodes[parentIndex].Height = 1 + Mathf.Max(m_nodes[index1].Height, m_nodes[index2].Height);
@@ -337,7 +334,6 @@ namespace BoundingVolumeHierarchy
                 newAABB.Encapsulate(m_nodes[index2].AABB);
                 m_nodes[parentIndex].AABB = newAABB;
 
-                //m_nodes[parentIndex].aabb.Combine(m_nodes[index1].aabb, m_nodes[index2].aabb);
                 m_nodes[parentIndex].Parent = NULL_NODE;
 
                 m_nodes[index1].Parent = parentIndex;
@@ -364,40 +360,6 @@ namespace BoundingVolumeHierarchy
             {
                 m_nodes[i].AABB.min -= newOrigin;
                 m_nodes[i].AABB.max -= newOrigin;
-            }
-        }
-
-        /// <summary>
-        /// Query an AABB for overlapping proxies. The callback class
-        /// is called for each proxy that overlaps the supplied AABB.
-        /// </summary>
-        public void Query(Bounds aabb, System.Func<Node, bool> callback)
-        {
-            m_growableStack.Clear();
-            m_growableStack.Push(m_root);
-
-            while (m_growableStack.Count > 0)
-            {
-                int nodeId = m_growableStack.Pop();
-
-                if (nodeId == NULL_NODE)
-                    continue;
-
-                if (m_nodes[nodeId].AABB.Intersects(aabb))
-                {
-                    if (m_nodes[nodeId].IsLeaf)
-                    {
-                        bool proceed = callback.Invoke(m_nodes[nodeId]);
-
-                        if (!proceed)
-                            return;
-                    }
-                    else
-                    {
-                        m_growableStack.Push(m_nodes[nodeId].Child1);
-                        m_growableStack.Push(m_nodes[nodeId].Child2);
-                    }
-                }
             }
         }
 
@@ -532,66 +494,6 @@ namespace BoundingVolumeHierarchy
                 }
             }
         }
-
-        ///// <summary>
-        ///// Enumerate the smallest possible set of bounds which encapsulate all leaf nodes without aby mutual overlaps.
-        ///// </summary>
-        //public IEnumerable<Bounds> GetNonOverlappingVolumes()
-        //{
-        //    foreach (Bounds bounds in GetNonOverlappingVolumes(m_root))
-        //        yield return bounds;
-        //}
-
-        //private IEnumerable<Bounds> GetNonOverlappingVolumes(int startPoint)
-        //{
-        //    Debug.Assert(0 <= startPoint && startPoint < m_nodeCapacity);
-        //    Debug.Assert(startPoint != NULL_NODE);
-
-        //    // i need a function which returns the bounds if the node is a leaf, or, if it's not a leaf, calls the function again on both its children,
-        //    // and then, if the two child bounds overlap, returns their union, otherwise returns them both separatelt
-
-        //    Node node = m_nodes[startPoint];
-
-        //    if (node.IsLeaf)
-        //    {
-        //        yield return node.AABB;
-        //    }
-        //    else
-        //    {
-        //        int child1 = node.Child1;
-        //        int child2 = node.Child2;
-
-        //        bool hasChild1 = child1 != NULL_NODE;
-        //        bool hasChild2 = child2 != NULL_NODE;
-
-        //        Bounds bounds1 = new Bounds();
-        //        Bounds bounds2 = new Bounds();
-
-        //        // each child could pass up any number of bounds
-
-        //        if (hasChild1)
-        //            foreach (Bounds bounds in GetNonOverlappingVolumes(child1))
-        //                bounds1.Encapsulate(bounds);
-
-        //        if (hasChild2)
-        //            foreach (Bounds bounds in GetNonOverlappingVolumes(child2))
-        //                bounds2.Encapsulate(bounds);
-
-        //        if (bounds1.Intersects(bounds2))
-        //        {
-        //            bounds1.Encapsulate(bounds2);
-        //            yield return bounds1;
-        //        }
-        //        else
-        //        {
-        //            if (hasChild1)
-        //                yield return bounds1;
-
-        //            if (hasChild2)
-        //                yield return bounds2;
-        //        }
-        //    }
-        //}
 
         #endregion
 
