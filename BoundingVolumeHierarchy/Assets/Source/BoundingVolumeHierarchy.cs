@@ -2,9 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace BoundingVolumeHierarchy
 {
+    /// <summary>
+    /// This is a port of Erin Catto/box2d's b2_dynamic_tree from C++ to C# (https://box2d.org/files/ErinCatto_DynamicBVH_GDC2019.pdf), intended for use in Unity. 
+    /// It's a very faithful translation with a couple of additional C# creature comforts for usability.
+    /// 
+    /// A bounding volume hierarchy is a sorted hierarchy of axis aligned bounding volumes (AABBs) in which closer AABBs are closer on the tree.
+    /// They are a common type of spatial optimization, often used to accelerate things like raycasts and physics queries.
+    /// </summary>
     public class BoundingVolumeHierarchy<T> where T : class, IBVHClientObject
     {
         #region Consts
