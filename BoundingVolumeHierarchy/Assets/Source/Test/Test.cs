@@ -13,6 +13,9 @@ public class Test : MonoBehaviour
     public static Test Instance => s_instance ? s_instance : s_instance = FindObjectOfType<Test>();
 
     [SerializeField]
+    private Transform m_raycastSource;
+
+    [SerializeField]
     private Color[] m_depthColours;
 
     private List<TestObject> m_objects;
@@ -107,6 +110,21 @@ public class Test : MonoBehaviour
 
             Handles.color = col;
             Handles.DrawWireCube(node.AABB.center, node.AABB.size);
+        }
+
+        if (m_raycastSource)
+        {
+            if (m_bvh.Raycast(new Ray(m_raycastSource.position, m_raycastSource.forward), out BoundingVolumeHierarchy<TestObject>.Node hit))
+            {
+                Handles.color = Color.white;
+                Handles.DrawWireCube(hit.AABB.center, hit.AABB.size - Vector3.one * 0.05f);
+            }
+            else
+            {
+                Handles.color = Color.black;
+            }
+
+            Handles.DrawLine(m_raycastSource.position, m_raycastSource.position + m_raycastSource.forward * 100f);
         }
     }
 }

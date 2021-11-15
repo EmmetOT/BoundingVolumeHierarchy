@@ -411,6 +411,33 @@ namespace BoundingVolumeHierarchy
             return GetPaddedBounds(key);
         }
 
+        public bool Raycast(Ray ray, out Node hit) => Raycast(ray, m_root, out hit);
+
+        private bool Raycast(Ray ray, int startPoint, out Node hit)
+        {
+            Debug.Assert(0 <= startPoint && startPoint < m_nodeCapacity);
+            Debug.Assert(startPoint != NULL_NODE);
+
+            hit = default;
+            Node node = m_nodes[startPoint];
+
+            if (node.IsLeaf)
+            {
+                hit = node;
+                return true;
+            }
+            else
+            {
+                if (TryGetNode(node.Child1, out Node node1) && node1.AABB.IntersectRay(ray) && Raycast(ray, node.Child1, out hit))
+                    return true;
+
+                if (TryGetNode(node.Child2, out Node node2) && node2.AABB.IntersectRay(ray) && Raycast(ray, node.Child2, out hit))
+                    return true;
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region New Public Methods
@@ -449,7 +476,7 @@ namespace BoundingVolumeHierarchy
         {
             node = default(Node);
 
-            if (key < 0 || key >= m_nodeCapacity)
+            if (key < 0 || key >= m_nodeCapacity || key == NULL_NODE)
                 return false;
 
             node = m_nodes[key];
